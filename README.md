@@ -24,7 +24,7 @@ CONTENTS:
    and are able to make a contribution to please do so commesurate with
    use (especially corporations). *** Important - Please donate using
    your PayPal account and not a credit card so as to avoid fees at
-   PayPal. Thank you! PayPal email ID: barrowes@users.sourceforge.net
+   PayPal. Thank you! PayPal email ID: barrowes@alum.mit.edu
 
 
 0. DISCLAIMER: Matlab is a trademark of the Mathworks company and is
@@ -36,8 +36,7 @@ CONTENTS:
    The author bears no responsibility for any unwanted effect
    resulting from the use of this program. The author is not
    affiliated with the Mathworks.  The source code is given in full in
-   the hopes that it will prove useful. Devlopment is done through
-   sourceforge at f2matlab.sourceforge.net.
+   the hopes that it will prove useful. 
 
 1. OBJECTIVE: f2matlab.m is a small translator which aims to
    convert Fortran90 files to Matlab m-files.
@@ -58,9 +57,7 @@ CONTENTS:
    conversion, was substantially simplified.
 
 3. BUG REPORTS and WISH LIST:
-   For all bug reports, a wish list for f2matlab, and suggestions,
-   see http://f2matlab.sourceforge.net/
-   or email barrowes@users.sourceforge.net
+   For all bug reports, email barrowes@alum.mit.edu
 
 4. F2MATLAB CAPABILITIES: f2matlab is aimed at converting 
    Fortran90 code to Matlab m-files. Accordingly, only basic data types
@@ -98,8 +95,7 @@ CONTENTS:
    Below are some specific examples. Other tests and examples include:
    
    Running the script TESTING_cfs in the comp_spec_func directory converts all of the f90
-   code from Shanjie Zhang and Jianming Jin's book. These converted m-files can also be found
-   at: http://ceta.mit.edu/comp_spec_func/
+   code from Shanjie Zhang and Jianming Jin's book. 
 
    For some larger examples (>=10000 lines), see the examples directory. The following
    fortran packages were downloaded (most from John Burkardt at FSU) and converted:
@@ -351,116 +347,6 @@ pd =
   Columns 9 through 11 
              2.77294921875         0.723724365234375         -2.31712341308594
 >> 
-
-Incidentally, it is now possible to convert lpmns.m into a fortran90
-mex file callable from Matlab using matlab2fmex.m.
-(See http://matlab2fmex.sourceforge.net/ )
-First, construct another input which is the same size as the
-output. Here is the modified lpmns2.m
-
-function [pm,pd]=lpmns(m,n,x,outsize)
-
-%**************************************************************
-
-%       ========================================================
-%       Purpose: Compute associated Legendre functions Pmn(x)
-%                and Pmn'(x) for a given order
-%       Input :  x --- Argument of Pmn(x)
-%                m --- Order of Pmn(x),  m = 0,1,2,...,n
-%                n --- Degree of Pmn(x), n = 0,1,2,...,N
-%       Output:  PM(n) --- Pmn(x)
-%                PD(n) --- Pmn'(x)
-%       ========================================================
-
-for  k=0:n;
- pm(k+1)=0.0d0;
- pd(k+1)=0.0d0;
-end;
-if (abs(x) == 1.0d0);
- for  k=0:n;
-  if (m == 0);
-   pm(k+1)=1.0d0;
-   pd(k+1)=0.5d0.*k.*(k+1.0);
-   if (x < 0.0);
-    pm(k+1)=(-1).^k.*pm(k+1);
-    pd(k+1)=(-1).^(k+1).*pd(k+1);
-   end;
-  elseif (m == 1);
-   pd(k+1)=1.0d+300;
-  elseif (m == 2);
-   pd(k+1)=-0.25d0.*(k+2.0).*(k+1.0).*k.*(k-1.0);
-   if (x < 0.0)
-    pd(k+1)=(-1).^(k+1).*pd(k+1);
-   end;
-  end;
- end;
- return;
-end;
-x0=abs(1.0d0-x.*x);
-pm0=1.0d0;
-pmk=pm0;
-for  k=1:m;
- pmk=(2.0d0.*k-1.0d0).*sqrt(x0).*pm0;
- pm0=pmk;
-end;
-pm1=(2.0d0.*m+1.0d0).*x.*pm0;
-pm(m+1)=pmk;
-pm(m+1+1)=pm1;
-for  k=m+2:n;
- pm2=((2.0d0.*k-1.0d0).*x.*pm1-(k+m-1.0d0).*pmk)./(k-m);
- pm(k+1)=pm2;
- pmk=pm1;
- pm1=pm2;
-end;
-pd(0+1)=((1.0d0-m).*pm(1+1)-x.*pm(0+1))./(x.*x-1.0);
-for  k=1:n;
- pd(k+1)=(k.*x.*pm(k+1)-(k+m).*pm(k-1+1))./(x.*x-1.0d0);
-end;
-
-Now create a lpmns.mat file using matlab2fmex_save:
-
->> n=10;matlab2fmex_save('[x,w]=lpmns2(0,n,.5,zeros(1,n+1));');
-
-And now convert lpmns.m to a fortran90 mex file:
-
->> matlab2fmex('lpmns2');
-Converting --- lpmns2.m  ==>  lpmns2.f  ==>  lpmns2.mex
-matlab2fmex.
- ==> mex lpmns2.f mexfunctions.f mexoperators.f mexcallback.f 
->> 
-
-Finally, we can call lpmns2 as a mex file from the Matlab command
-prompt: 
-
->> [pm,pd]=lpmns2(0,n,.5,zeros(1,n+1))
-pm =
-  Columns 1 through 3 
-                         1                       0.5                    -0.125
-  Columns 4 through 6 
-                   -0.4375                -0.2890625                0.08984375
-  Columns 7 through 9 
-              0.3232421875             0.22314453125        -0.073638916015625
-  Columns 10 through 11 
-        -0.267898559570312        -0.188228607177734
-pd =
-  Columns 1 through 3 
-                         0                         1                       1.5
-  Columns 4 through 6 
-                     0.375                   -1.5625                -2.2265625
-  Columns 7 through 9 
-               -0.57421875              1.9755859375             2.77294921875
-  Columns 10 through 11 
-         0.723724365234375         -2.31712341308594
->> 
->> which lpmns2
-/home/barrowes/compiler/f2matlab/examples/lpmns2.mexaxp
->> 
-
-We have just converted a native fortran77 subroutine into a fortran90
-mex file usable (with variable sized inputs) in Matlab.
-
-
-lqmns.f in the examples directory can be handles similarly.
 
 
 As another example, let's follow the same procedure with dgauleg.f, a
