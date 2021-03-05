@@ -17,8 +17,8 @@ CONTENTS:
 -1.SUPPORT f2matlab. 
    I now also do conversion/translation/validation/optimization consulting.
    Please refer to my webpage:
-   http://engineering.dartmouth.edu/~d30574x/consulting/consultingIndex.html
-
+   https://sites.dartmouth.edu/barrowes/consulting/
+   
    Even though f2matlab is free (under GPL) for the using, I would like
    to ask that those who find it useful, wish to support the project,
    and are able to make a contribution to please do so commesurate with
